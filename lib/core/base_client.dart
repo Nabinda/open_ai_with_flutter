@@ -26,8 +26,9 @@ class BaseClient {
           options.headers['Accept'] = "application/json";
           options.headers['Content-Type'] = "application/json";
 
+          ///Put your api key from open-AI here
           options.headers['Authorization'] =
-              "Bearer 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";
+              "Bearer ";
           _dio.unlock();
           r.next(options);
         },

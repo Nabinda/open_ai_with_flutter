@@ -11,17 +11,15 @@ class ImageBloc extends ChangeNotifier {
   final Ref ref;
   AsyncValue<List> retrivedData = const AsyncLoading();
 
-  Future<void> getImage(
-      {required String prompt,
-      int imageCount = 4,
-
-      ///If Image Size is null than the default image size will be ImageSize.size_1024X1024
-      ImageSize? imageSize}) async {
+  Future<void> getImage({
+    required String prompt,
+    required ImageSize imageSize,
+    int imageCount = 4,
+  }) async {
     try {
       retrivedData = const AsyncLoading();
       customNotifyListeners();
-      final imageFilterSize =
-          ImageSizeFilter().filter(imageSize ?? ImageSize.size_1024x1024);
+      final imageFilterSize = ImageSizeFilter().filter(imageSize);
 
       final result = await ref.read(appRepo).searchImage(
           {'prompt': prompt, 'n': imageCount, 'size': imageFilterSize});

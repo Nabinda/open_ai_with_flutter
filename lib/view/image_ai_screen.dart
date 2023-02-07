@@ -15,7 +15,8 @@ class _ImageAIScreenState extends ConsumerState<ImageAIScreen> {
   final promptCon = TextEditingController();
 
   bool showResults = false;
-  ImageSize? size;
+  ImageSize size = ImageSize.size_1024x1024;
+  int count = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,7 @@ class _ImageAIScreenState extends ConsumerState<ImageAIScreen> {
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -45,6 +47,27 @@ class _ImageAIScreenState extends ConsumerState<ImageAIScreen> {
                   ),
                 ),
                 const SizedBox(width: 18),
+                const Text('Image Count: '),
+                DropdownButton(
+                    alignment: Alignment.bottomCenter,
+                    value: count,
+                    isDense: true,
+                    onChanged: (value) {
+                      setState(() {
+                        count = value ?? 4;
+                      });
+                    },
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    items: [
+                      ...List.generate(
+                        10,
+                        (index) => DropdownMenuItem(
+                          value: index + 1,
+                          child: Text('${index + 1}'),
+                        ),
+                      )
+                    ]),
+                const SizedBox(width: 18),
                 PopupMenuButton(
                   tooltip: 'Image Filter',
                   itemBuilder: (context) => [
@@ -58,8 +81,16 @@ class _ImageAIScreenState extends ConsumerState<ImageAIScreen> {
                               size = ImageSize.values[index];
                             });
                           },
-                          child: Text(ImageSizeFilter()
-                              .filter(ImageSize.values[index])),
+                          child: Text(
+                            ImageSizeFilter().filter(ImageSize.values[index]),
+                            style: TextStyle(
+                                fontWeight: size == ImageSize.values[index]
+                                    ? FontWeight.w700
+                                    : null,
+                                color: size == ImageSize.values[index]
+                                    ? Colors.green
+                                    : null),
+                          ),
                         );
                       },
                     )
@@ -78,9 +109,10 @@ class _ImageAIScreenState extends ConsumerState<ImageAIScreen> {
                       setState(() {
                         showResults = true;
                       });
-                      ref
-                          .read(imageBloc)
-                          .getImage(prompt: promptCon.text, imageSize: size);
+                      ref.read(imageBloc).getImage(
+                          prompt: promptCon.text,
+                          imageSize: size,
+                          imageCount: count);
                     }
                   },
                   child: Container(
@@ -106,15 +138,11 @@ class _ImageAIScreenState extends ConsumerState<ImageAIScreen> {
                       child: GridView.custom(
                           shrinkWrap: true,
                           physics: const BouncingScrollPhysics(),
-                          gridDelegate: SliverQuiltedGridDelegate(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
                             mainAxisSpacing: 4,
                             crossAxisSpacing: 4,
-                            repeatPattern: QuiltedGridRepeatPattern.inverted,
-                            pattern: const [
-                              QuiltedGridTile(1, 1),
-                              QuiltedGridTile(1, 1),
-                            ],
                           ),
                           childrenDelegate: SliverChildBuilderDelegate(
                             (context, index) {
